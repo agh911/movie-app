@@ -1,15 +1,19 @@
-var searchInput = document.querySelector('.search');
-var itemWrapper = document.querySelector('main');
+var searchInput = $('.search');
+var itemWrapper = $('main');
 
 function displayMatches(matches) {
-  itemWrapper.innerHTML = '';
+  itemWrapper.html('');
+
+  if (!matches) {
+    return itemWrapper.html(`<p class="no-search">No results found.</p>`);
+  }
 
   for (var matchObj of matches) {
-    itemWrapper.insertAdjacentHTML('beforeend', `
-      <div class="movie-item" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${matchObj.image_url})">
-        <h3>${matchObj.title}</h3>
-        <p>${matchObj.description}</p>
-        <a href="${matchObj.imdb_url}" target="_blank">View More Details</a>
+    itemWrapper.append(`
+      <div class="movie-item" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${matchObj.Poster})">
+        <h3>${matchObj.Title}</h3>
+        <p>Release Year: ${matchObj.Year}</p>
+        <a href="https://www.imdb.com/title/${matchObj.imdbID}" target="_blank">View More Details</a>
       </div>
     `);
   }
@@ -17,56 +21,20 @@ function displayMatches(matches) {
 
 function getMovieData(event) {
   var keyCode = event.keyCode;
-  var searchText = searchInput.value.trim().toLowerCase();
+  var searchText = searchInput.val().trim();
 
   if (keyCode === 13 && searchText) {
     var matches = [];
 
-    for (var movie of movieData) {
-      if (movie.title.toLowerCase().includes(searchText)) {
-        matches.push(movie);
-      }
-    }
-
-
-    // fetch('https://www.omdbapi.com/?apikey=20dc4c7f&t=drive')
-    //   .then(function(responseObj) {
-
-    //   });
-
-    var responsePromise = fetch('https://www.omdbapi.com/?apikey=20dc4c7f&t=drive');
-
-    function handleResponse(responseObj) {
-      return responseObj.json();
-    }
-
-    responsePromise
-      .then(handleResponse)
-      .then(function (data) {
-        console.log(data);
-        return 'this is cool';
-      })
-      .then(function (huh) {
-        console.log(huh);
-        var test = 'test';
-        console.log(test);
-      });
-
-
-    // responsePromise.then(function (responseObj) {
-    //   var dataPromise = responseObj.json();
-
-    //   dataPromise.then(function (data) {
-    //     console.log(data);
-    //   });
-    // });
-
-    displayMatches(matches);
+    $.get(`https://www.omdbapi.com/?apikey=20dc4c7f&s=${searchText}`)
+    .then(function (data) {
+      displayMatches(data.Search);      
+    });
   }
 }
 
 function init() {
-  searchInput.addEventListener('keydown', getMovieData);
+  searchInput.keydown(getMovieData);
 }
 
 init();

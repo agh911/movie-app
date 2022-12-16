@@ -4,12 +4,16 @@ var itemWrapper = document.querySelector('main');
 function displayMatches(matches) {
   itemWrapper.innerHTML = '';
 
+  if (!matches) {
+    return itemWrapper.innerHTML = `<p class="no-search">No results found.</p>`
+  }
+
   for (var matchObj of matches) {
     itemWrapper.insertAdjacentHTML('beforeend', `
-      <div class="movie-item" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${matchObj.image_url})">
-        <h3>${matchObj.title}</h3>
-        <p>${matchObj.description}</p>
-        <a href="${matchObj.imdb_url}" target="_blank">View More Details</a>
+      <div class="movie-item" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${matchObj.Poster})">
+        <h3>${matchObj.Title}</h3>
+        <p>Release Year: ${matchObj.Year}</p>
+        <a href="https://www.imdb.com/title/${matchObj.imdbID}" target="_blank">View More Details</a>
       </div>
     `);
   }
@@ -34,7 +38,7 @@ function getMovieData(event) {
 
     //   });
 
-    var responsePromise = fetch('https://www.omdbapi.com/?apikey=20dc4c7f&t=drive');
+    var responsePromise = fetch(`https://www.omdbapi.com/?apikey=20dc4c7f&s=${searchText}`);
 
     function handleResponse(responseObj) {
       return responseObj.json();
@@ -43,25 +47,10 @@ function getMovieData(event) {
     responsePromise
       .then(handleResponse)
       .then(function (data) {
-        console.log(data);
-        return 'this is cool';
-      })
-      .then(function (huh) {
-        console.log(huh);
-        var test = 'test';
-        console.log(test);
+        displayMatches(data.Search);      
       });
 
 
-    // responsePromise.then(function (responseObj) {
-    //   var dataPromise = responseObj.json();
-
-    //   dataPromise.then(function (data) {
-    //     console.log(data);
-    //   });
-    // });
-
-    displayMatches(matches);
   }
 }
 
